@@ -1,0 +1,49 @@
+[package]
+name = "model-port"
+version = "0.1.0"
+edition = "2021"
+description = "Local Anthropic-compatible model gateway for Claude Code and VS Code Claude."
+license = "MIT"
+repository = "https://github.com/xueying24100-source/ModelPort"
+readme = "README.md"
+
+[[bin]]
+name = "model-port"
+path = "src/main.rs"
+
+[dependencies]
+# Web framework / HTTP server
+axum = "0.8"
+tokio = { version = "1", features = ["full"] }
+tower = { version = "0.5", features = ["limit"] }
+tower-http = { version = "0.6", features = ["trace", "request-id"] }
+
+# Upstream HTTP client (provider requests, SSE streaming)
+reqwest = { version = "0.12", default-features = false, features = ["json", "stream", "rustls-tls"] }
+futures-util = "0.3"
+async-stream = "0.3"
+
+# Serialization
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+
+# Auth / crypto
+argon2 = "0.5"
+rand_core = { version = "0.6", features = ["std"] }
+sha2 = "0.10"
+uuid = { version = "1", features = ["v4"] }
+
+# Errors / logging
+thiserror = "2"
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+
+# Optional PostgreSQL-backed control-plane storage (falls back to local JSON files
+# when MODELPORT_DATABASE_URL is not set, see src/storage.rs)
+postgres = { version = "0.19", features = ["with-serde_json-1"] }
+
+[profile.release]
+opt-level = 3
+lto = true
+codegen-units = 1
+strip = true
